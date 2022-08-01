@@ -70,6 +70,7 @@ int main(int argc, char **argv) {
         goto error;
     }
 
+
     textures = malloc(MAX_DAB * sizeof(SDL_Texture *));
     for (int i=0; i<MAX_DAB+1; i++) {
         sprintf(path, "romfs:/mario_dab%d.jpg", i);
@@ -78,15 +79,19 @@ int main(int argc, char **argv) {
             SDL_Log("Could not load %s: %s\n", path, IMG_GetError());
     }
 
+    PadState pad;
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+    padInitializeDefault(&pad);
+
     Mix_PlayMusic(music, -1);
     while (appletMainLoop()) {
-        hidScanInput();
-        keys_down = hidKeysDown(CONTROLLER_P1_AUTO);
+        padUpdate(&pad);
+        keys_down = padGetButtonsDown(&pad);
         
-        if (keys_down & KEY_PLUS) 
+        if (keys_down & HidNpadButton_Plus)
             break;
 
-        if (keys_down & KEY_A) {
+        if (keys_down & HidNpadButton_A) {
             texture_index = (texture_index + 1) % (MAX_DAB + 1);
         }
 
